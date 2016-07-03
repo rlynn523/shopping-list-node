@@ -17,13 +17,32 @@ Storage.prototype.add = function(name){
     this.id += 1;
     return item;
 };
-
+Storage.prototype.delete = function(id){
+    var myStorage = this;
+    var myDeletedItem;
+    this.items.forEach(function(item, i){
+        if(id == item.id){
+            myStorage.items.splice(i,1);
+            myDeletedItem = item;
+        }
+    });
+    return myDeletedItem;
+};
+Storage.prototype.put = function(name, id){
+    var myStorage = this;
+    var newItem =  {name: name, id: id};
+    this.items.forEach(function(item, i){
+        if(id == item.id){
+            myStorage.items[i] = newItem;
+        }
+    });
+    return newItem;
+};
 var storage = new Storage();
 // Static list of three items
 storage.add("Broad beans");
 storage.add("Tomatoes");
 storage.add("Peppers");
-
 // Create app object and tell it to use the express.static middleware
 // This tells express to serve any static content contained in the public folder
 var app = express();
@@ -48,11 +67,27 @@ undefined. */
     var item = storage.add(req.body.name);
     res.status(201).json(item);
 });
+
 app.delete("/items/:item_id", function(req, res){
     var id = req.params.item_id;
-    console.log(id);
-    res.status(204);
+    var deletedItem = storage.delete(id);
+    if(deletedItem){
+        res.status(200).json(deletedItem);
+    } else {
+        res.sendStatus(404);
+    }
 });
-/* Tell the app to listen for requsts on a port which defaults to 80880 but can
+
+app.put("/items/:item_id", jsonParser, function(req, res){
+    var id = req.params.item_id;
+    var name = req.body.name;
+    var updatedItem = storage.put(name, id);
+    if(updatedItem){
+        res.status(200).json(updatedItem);
+    } else {
+        res.sendStatus(404);
+    }
+});
+/* Tell the app to listen for requsts on a port which defaults to 8080 but can
 be configured using an environment variable */
 app.listen(process.env.PORT || 8080);
