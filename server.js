@@ -86,7 +86,7 @@ app.delete("/items/:item_id", function(req, res) {
 });
 
 app.put("/items/:item_id", jsonParser, function(req, res) {
-    var id = req.params.item_id;
+    var id = parseInt(req.params.item_id);
     var name = req.body.name;
     var updatedItem = storage.put(name, id);
     if (updatedItem) {
@@ -98,3 +98,6 @@ app.put("/items/:item_id", jsonParser, function(req, res) {
 /* Tell the app to listen for requsts on a port which defaults to 8080 but can
 be configured using an environment variable */
 app.listen(process.env.PORT || 8080);
+
+exports.app = app;
+exports.storage = storage;
